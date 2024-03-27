@@ -1,10 +1,18 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Box from "@mui/material/Box";
+import LoginForm from "./components/Form";
 
-export default function Home() {
+export default function LoginPage() {
   return (
-    <main className={styles.main}>
-      <h3>Janhith</h3>
-    </main>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        width: "100%",
+      }}
+    >
+      <LoginForm />
+    </Box>
   );
 }

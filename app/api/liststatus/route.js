@@ -15,12 +15,9 @@ export async function GET(Request) {
     );
   }
 
-  // console.log("after functin....");
-
-  // console.log(session);
   try {
     const token = await getSecToken();
-    const response = await fetch(process.env.SEC_DATAURL + "listcategories", {
+    const response = await fetch(process.env.SEC_DATAURL + "liststatus", {
       method: "POST",
       headers: new Headers({
         "Content-type": "application/json",
@@ -33,17 +30,21 @@ export async function GET(Request) {
     });
 
     const data = await response.json();
+    console.log(data);
+
     const message = JSON.parse(data?.message) || [];
     if (data && data?.result && message.status === "success") {
       return Response.json(
         { data: data.result, message: message.message },
         { status: 200 }
       );
+    } else {
+      return Response.json({ message, data }, { status: 400 });
     }
   } catch (e) {
     console.log(e);
     return Response.json(
-      { status: "error", message: "Error fetching categories" },
+      { status: "error", message: "Error fetching status" },
       { status: 401 }
     );
   }

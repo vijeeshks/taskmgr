@@ -15,104 +15,40 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-
-const drawerWidth = 240;
+import LogoutIcon from "@mui/icons-material/Logout";
 
 export default function Header(props) {
-  const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
   const { status: loadingSession, data: session } = useSession();
   const router = useRouter();
-
-  const handleDrawerToggle = () => {
-    setMobileOpen((prevState) => !prevState);
-  };
-
-  function handleButtonClick(url) {
-    router.push(`/${url}`);
+  if (!loadingSession && !session) {
+    router.push("/");
   }
-  const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        JanhithAdmin
-      </Typography>
-      <Divider />
-      <List>
-        {session?.user?.roles?.map((item) => (
-          <ListItem
-            key={item.url}
-            disablePadding
-            onClick={() => handleButtonClick(item.url)}
-          >
-            <ListItemButton sx={{ textAlign: "center" }}>
-              <ListItemText primary={item.url} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
 
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
+  function logoutClick() {
+    signOut();
+    router.push("/");
+  }
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar component="nav">
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
-          >
-            Janhith-Admin
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Task Manager
           </Typography>
-          <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            {session?.user?.roles?.map((item) => (
-              <Button
-                key={item.url}
-                sx={{ color: "#fff" }}
-                onClick={() => handleButtonClick(item.url)}
-              >
-                {item.url}
-              </Button>
-            ))}
-          </Box>
+          {session && (
+            <Typography variant="caption" component="div" sx={{ flexGrow: 1 }}>
+              {session.user.email}
+            </Typography>
+          )}
+          {session && <LogoutIcon onClick={logoutClick}></LogoutIcon>}
         </Toolbar>
       </AppBar>
-      <nav>
-        <Drawer
-          container={container}
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
-          }}
-        >
-          {drawer}
-        </Drawer>
-      </nav>
-      <Box component="main" sx={{ p: 3 }}>
+
+      <Box component="main">
         <Toolbar />
         {props.children}
       </Box>

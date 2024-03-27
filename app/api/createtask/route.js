@@ -1,9 +1,8 @@
 import { authOptions } from "@/lib/auth";
 import { getSecToken } from "@/lib/getSecToken";
 import { getServerSession } from "next-auth/next";
-export async function GET(Request) {
-  const { searchParams } = new URL(Request.url);
-  const id = searchParams.get("id");
+export async function POST(Request) {
+  const { title, description } = await Request.json();
   const session = await getServerSession(authOptions);
   if (!session) {
     return Response.json(
@@ -17,10 +16,9 @@ export async function GET(Request) {
 
   // console.log("after functin....");
 
-  // console.log(session);
   try {
     const token = await getSecToken();
-    const response = await fetch(process.env.SEC_DATAURL + "listcourtesies", {
+    const response = await fetch(process.env.SEC_DATAURL + "createtask", {
       method: "POST",
       headers: new Headers({
         "Content-type": "application/json",
@@ -29,21 +27,23 @@ export async function GET(Request) {
       body: JSON.stringify({
         session: session.user.session,
         userid: session.user.userid,
+        title,
+        description,
       }),
     });
 
     const data = await response.json();
+
     const message = JSON.parse(data?.message) || [];
-    if (data && data?.result && message.status === "success") {
-      return Response.json(
-        { data: data.result, message: message.message },
-        { status: 200 }
-      );
+    if (message.status === "success") {
+      return Response.json({ data: data.taskid, message }, { status: 200 });
+    } else {
+      return Response.json({ message, data }, { status: 400 });
     }
   } catch (e) {
     console.log(e);
     return Response.json(
-      { status: "error", message: "Error fetching courtesies" },
+      { status: "error", message: "Error creating task" },
       { status: 401 }
     );
   }

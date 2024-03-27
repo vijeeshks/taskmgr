@@ -2,14 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { getSecToken } from "@/lib/getSecToken";
 import { getServerSession } from "next-auth/next";
 export async function POST(Request) {
-  const {
-    categoryid: newscategoryid,
-    courtesyid,
-    title,
-    description,
-    tags,
-    referenceno,
-  } = await Request.json();
+  const { taskid } = await Request.json();
   const session = await getServerSession(authOptions);
   if (!session) {
     return Response.json(
@@ -23,10 +16,9 @@ export async function POST(Request) {
 
   // console.log("after functin....");
 
-  // console.log(session);
   try {
     const token = await getSecToken();
-    const response = await fetch(process.env.SEC_DATAURL + "createnews", {
+    const response = await fetch(process.env.SEC_DATAURL + "deletetask", {
       method: "POST",
       headers: new Headers({
         "Content-type": "application/json",
@@ -35,32 +27,22 @@ export async function POST(Request) {
       body: JSON.stringify({
         session: session.user.session,
         userid: session.user.userid,
-        newscategoryid,
-        courtesyid,
-        title,
-        description,
-        tags,
-        referenceno,
+        taskid,
       }),
     });
 
     const data = await response.json();
+
     const message = JSON.parse(data?.message) || [];
-    if (data && data?.newsid && message.status === "success") {
-      return Response.json(
-        { data: data.newsid, message: message.message },
-        { status: 200 }
-      );
+    if (message.status === "success") {
+      return Response.json({ message }, { status: 200 });
     } else {
-      return Response.json(
-        { data: [], message: "Error creating news" },
-        { status: 400 }
-      );
+      return Response.json({ message, data }, { status: 400 });
     }
   } catch (e) {
     console.log(e);
     return Response.json(
-      { status: "error", message: "Error creating news" },
+      { status: "error", message: "Error deleting task" },
       { status: 401 }
     );
   }

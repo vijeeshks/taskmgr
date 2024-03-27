@@ -7,8 +7,8 @@ import { Container } from "@mui/material";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Janhith",
-  description: "Janhith admin",
+  title: "Task Manager",
+  description: "Task Manager",
 };
 
 export default function RootLayout({

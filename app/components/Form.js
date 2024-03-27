@@ -9,28 +9,19 @@ const LoginFormComponent = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
-    username: "vijeesh.ks@gmail.com",
+    email: "vijeesh.ks@gmail.com",
     pwd: "test",
   });
   const [error, setError] = useState("");
-  const { status, loadingSession, data: session } = useSession();
+  const { status: loadingSession, data: session } = useSession();
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/profile";
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   useEffect(() => {
-    if (!loadingSession && session && router) {
-      const roles = session.user.roles;
-      if (roles && roles?.length > 0) {
-        let defaultRole = roles.find((role) => role?.isdefault === 1);
-        if (!defaultRole) {
-          defaultRole = roles[0];
-        }
-        if (defaultRole) {
-          const url = `/${defaultRole.url}`;
-          router.push(url);
-        }
-      }
+    console.log(loadingSession, session, router);
+    if (loadingSession === "authenticated" && session) {
+      router.push("/dashboard");
     }
   }, [loadingSession, session, router]);
 
@@ -42,7 +33,7 @@ const LoginFormComponent = () => {
 
       const res = await signIn("credentials", {
         redirect: false,
-        email: formValues.username,
+        email: formValues.email,
         password: formValues.pwd,
         callbackUrl,
       });
@@ -82,8 +73,8 @@ const LoginFormComponent = () => {
             <TextField
               required
               type="email"
-              name="username"
-              value={formValues.username}
+              name="email"
+              value={formValues.email}
               onChange={handleChange}
               placeholder="Email address"
             />
