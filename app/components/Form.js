@@ -19,7 +19,6 @@ const LoginFormComponent = () => {
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   useEffect(() => {
-    console.log(loadingSession, session, router);
     if (loadingSession === "authenticated" && session) {
       router.push("/dashboard");
     }

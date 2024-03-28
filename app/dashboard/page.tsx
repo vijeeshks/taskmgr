@@ -13,54 +13,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Task from "../components/Task";
 import AddIcon from "@mui/icons-material/Add";
-
-const AddTask = ({
-  handleAddTask,
-  setShowAdd,
-}: {
-  handleAddTask(title: string, description: string): void;
-  setShowAdd(val: Boolean): void;
-}) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-
-  function handleAddClick() {
-    if (title && description) {
-      handleAddTask(title, description);
-      setTitle("");
-      setDescription("");
-    }
-  }
-
-  return (
-    <Box>
-      <TextField
-        required
-        fullWidth
-        id="title-required"
-        label="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <TextField
-        fullWidth
-        id="desc-disabled"
-        label="Description"
-        value={description}
-        multiline
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <Box
-        sx={{ display: "flex", justifyContent: "end", alignItems: "center" }}
-      >
-        <Button onClick={() => setShowAdd(false)}>Cancel</Button>
-        <Button variant="contained" onClick={handleAddClick}>
-          Add
-        </Button>
-      </Box>
-    </Box>
-  );
-};
+import AddTask from "../components/AddTask";
 
 export default function Dashboard() {
   const { status: loadingSession, data: session } = useSession();
@@ -69,9 +22,12 @@ export default function Dashboard() {
   const [loading, setLoading] = useState<Boolean>(false);
   const [showAdd, setShowAdd] = useState<Boolean>(false);
   const router = useRouter();
-  if (loadingSession === "unauthenticated" || !session) {
-    router.push("/");
-  }
+
+  useEffect(() => {
+    if (loadingSession === "unauthenticated" || !session) {
+      router.push("/");
+    }
+  }, [loadingSession, session, router]);
 
   async function loadTasks() {
     setLoading(true);
