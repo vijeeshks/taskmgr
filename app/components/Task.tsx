@@ -94,7 +94,7 @@ export default function Task({
           width: "100%",
         }}
       >
-        {statusChanging && <CircularProgress size="small"></CircularProgress>}
+        {statusChanging && <CircularProgress></CircularProgress>}
 
         {status?.map((item) => (
           <Chip

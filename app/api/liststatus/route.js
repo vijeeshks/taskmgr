@@ -30,7 +30,6 @@ export async function GET(Request) {
     });
 
     const data = await response.json();
-    console.log(data);
 
     const message = JSON.parse(data?.message) || [];
     if (data && data?.result && message.status === "success") {

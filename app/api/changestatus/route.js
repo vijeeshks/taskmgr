@@ -14,9 +14,6 @@ export async function POST(Request) {
     );
   }
 
-  // console.log("after functin....");
-
-  console.log(session);
   try {
     const token = await getSecToken();
     const response = await fetch(process.env.SEC_DATAURL + "changestatus", {

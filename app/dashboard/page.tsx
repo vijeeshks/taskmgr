@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { ITask, IStatus } from "@/lib/interfaces";
 import {
+  Alert,
+  AlertProps,
   Box,
   Button,
   CircularProgress,
@@ -14,6 +16,7 @@ import { useRouter } from "next/navigation";
 import Task from "../components/Task";
 import AddIcon from "@mui/icons-material/Add";
 import AddTask from "../components/AddTask";
+import AlertSnackbar from "../components/AlertSnackbar";
 
 export default function Dashboard() {
   const { status: loadingSession, data: session } = useSession();
@@ -21,6 +24,11 @@ export default function Dashboard() {
   const [statusList, setStatusList] = useState<IStatus[]>([]);
   const [loading, setLoading] = useState<Boolean>(false);
   const [showAdd, setShowAdd] = useState<Boolean>(false);
+  const [alert, setAlert] = useState<any>({
+    open: false,
+    message: "",
+    severity: "info",
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -29,6 +37,9 @@ export default function Dashboard() {
     }
   }, [loadingSession, session, router]);
 
+  function resetAlert() {
+    setAlert({ open: false, message: " ", severity: "info" });
+  }
   async function loadTasks() {
     setLoading(true);
     try {
@@ -36,9 +47,25 @@ export default function Dashboard() {
       if (response.status === 200) {
         const data = await response.json();
         setTasks(data?.data || []);
+        setAlert({
+          open: true,
+          message: "Tasks loaded..",
+          severity: "success",
+        });
+      } else {
+        setAlert({
+          open: true,
+          message: "Something went wrong..",
+          severity: "error",
+        });
       }
       setLoading(false);
     } catch (e) {
+      setAlert({
+        open: true,
+        message: "Something went wrong..",
+        severity: "error",
+      });
       setLoading(false);
     }
   }
@@ -52,10 +79,28 @@ export default function Dashboard() {
       if (response.status === 200) {
         const data = await response.json();
         if (data?.message?.status === "success") {
+          setAlert({
+            open: true,
+            message: "Task deleted successfully..",
+            severity: "success",
+          });
+
           loadTasks();
+        } else {
+          setAlert({
+            open: true,
+            message: data?.message?.message || "Something went wrong..",
+            severity: "error",
+          });
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      setAlert({
+        open: true,
+        message: "Something went wrong..",
+        severity: "error",
+      });
+    }
   }
   async function handleAddTask(title: string, description: string) {
     try {
@@ -65,14 +110,30 @@ export default function Dashboard() {
       });
       if (response.status === 200) {
         const data = await response.json();
-        console.log(data);
         if (data) {
+          setAlert({
+            open: true,
+            message: "Task created..",
+            severity: "success",
+          });
           loadTasks();
+        } else {
+          setAlert({
+            open: true,
+            message: "Something went wrong..",
+            severity: "error",
+          });
         }
       }
 
       setShowAdd(false);
-    } catch (e) {}
+    } catch (e) {
+      setAlert({
+        open: true,
+        message: "Something went wrong..",
+        severity: "error",
+      });
+    }
   }
   function changeStatus(taskid: string, statusid: number) {
     const newTasks: ITask[] = tasks?.map((item: ITask) => {
@@ -80,7 +141,6 @@ export default function Dashboard() {
         const status = statusList?.find(
           (stat: IStatus) => stat?.statusid === statusid
         )?.status!;
-        console.log(statusid);
         return {
           ...item,
           statusid: statusid,
@@ -126,6 +186,7 @@ export default function Dashboard() {
         gap: "5px",
       }}
     >
+      <AlertSnackbar setAlert={setAlert} alert={alert}></AlertSnackbar>
       <Box
         sx={{
           display: "flex",

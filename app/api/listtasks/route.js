@@ -15,9 +15,6 @@ export async function GET(Request) {
     );
   }
 
-  // console.log("after functin....");
-
-  console.log(session);
   try {
     const token = await getSecToken();
     const response = await fetch(process.env.SEC_DATAURL + "listtasks", {
@@ -31,10 +28,8 @@ export async function GET(Request) {
         userid: session.user.userid,
       }),
     });
-    console.log(response);
 
     const data = await response.json();
-    console.log(data);
 
     const message = JSON.parse(data?.message) || [];
     if (data && data?.result && message.status === "success") {

@@ -14,8 +14,6 @@ export async function POST(Request) {
     );
   }
 
-  // console.log("after functin....");
-
   try {
     const token = await getSecToken();
     const response = await fetch(process.env.SEC_DATAURL + "deletetask", {

@@ -8,12 +8,11 @@ import { ChangeEvent, Suspense, useEffect, useState } from "react";
 const LoginFormComponent = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [formValues, setFormValues] = useState({
-    email: "vijeesh.ks@gmail.com",
-    pwd: "test",
-  });
+
   const [error, setError] = useState("");
   const { status: loadingSession, data: session } = useSession();
+  const [email, setEmail] = useState("vijeesh.ks@gmail.com");
+  const [password, setPassword] = useState("test");
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -28,12 +27,13 @@ const LoginFormComponent = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      setFormValues({ username: "", pwd: "" });
+      setEmail("");
+      setPassword("");
 
       const res = await signIn("credentials", {
         redirect: false,
-        email: formValues.email,
-        password: formValues.pwd,
+        email,
+        password,
         callbackUrl,
       });
       setLoading(false);
@@ -47,11 +47,6 @@ const LoginFormComponent = () => {
       setLoading(false);
       setError(error);
     }
-  };
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormValues({ ...formValues, [name]: value });
   };
 
   return (
@@ -73,8 +68,8 @@ const LoginFormComponent = () => {
               required
               type="email"
               name="email"
-              value={formValues.email}
-              onChange={handleChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="Email address"
             />
           </Box>
@@ -83,8 +78,8 @@ const LoginFormComponent = () => {
               required
               type="password"
               name="pwd"
-              value={formValues.pwd}
-              onChange={handleChange}
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
               placeholder="Password"
             />
           </Box>
