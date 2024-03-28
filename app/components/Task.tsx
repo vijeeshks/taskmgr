@@ -13,6 +13,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteConfirmModal from "./DeleteConfirmDialog";
 
 export default function Task({
   task,
@@ -26,6 +27,7 @@ export default function Task({
   deleteTask: (taskid: string) => void;
 }) {
   const [statusChanging, setStatusChanging] = useState(false);
+  const [open, setOpen] = useState(false);
   async function handleChangeStatus(statusid: number, taskid: string) {
     if (task.statusid === statusid) {
       return;
@@ -62,6 +64,15 @@ export default function Task({
         padding: "2px",
       }}
     >
+      {open && (
+        <DeleteConfirmModal
+          open={open}
+          setOpen={setOpen}
+          deleteTask={deleteTask}
+          taskId={task.taskid}
+        ></DeleteConfirmModal>
+      )}
+
       <Box
         sx={{
           display: "flex",
@@ -104,7 +115,7 @@ export default function Task({
           ></Chip>
         ))}
 
-        <IconButton color="error" onClick={() => deleteTask(task.taskid)}>
+        <IconButton color="error" onClick={() => setOpen(true)}>
           <DeleteIcon></DeleteIcon>
         </IconButton>
       </Box>
